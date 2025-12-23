@@ -7,8 +7,9 @@ import torchvision
 import torchvision.transforms as transforms
 
 import flwr as fl
-from torch.utils.data import DataLoader, Subset
+from torch.utils.data import DataLoader
 from models.model import Net
+from data_loader import ClientImageDataset
 
 
 # Client identity
