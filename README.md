@@ -1,5 +1,7 @@
 Library installation
 
+Install tailscale vpn on server and client machines and use the server's ip in client code.
+
 ```bash
 conda create -n flower-env python=3.11
 conda activate flower-env

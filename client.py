@@ -19,16 +19,10 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # Data partitioning
-
-def load_data(client_id, num_clients):
+def load_data(client_id):
     transform = transforms.Compose([transforms.ToTensor()])
 
-    trainset = torchvision.datasets.MNIST(
-        root="./data",
-        train=True,
-        download=True,
-        transform=transform,
-    )
+    trainset = ClientImageDataset(client_id, transform=transform)
 
     testset = torchvision.datasets.MNIST(
         root="./data",
@@ -37,15 +31,8 @@ def load_data(client_id, num_clients):
         transform=transform,
     )
 
-    indices = np.arange(len(trainset))
-    np.random.seed(42)
-    np.random.shuffle(indices)
-
-    splits = np.array_split(indices, num_clients)
-    client_indices = splits[client_id]
-
     trainloader = DataLoader(
-        Subset(trainset, client_indices),
+        trainset,
         batch_size=32,
         shuffle=True,
     )
@@ -58,11 +45,12 @@ def load_data(client_id, num_clients):
 
     return trainloader, testloader
 
+
 # Flower client
 class FlowerClient(fl.client.NumPyClient):
     def __init__(self):
         self.model = Net().to(DEVICE)
-        self.trainloader, self.testloader = load_data(CLIENT_ID, NUM_CLIENTS)
+        self.trainloader, self.testloader = load_data(CLIENT_ID)
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = optim.SGD(self.model.parameters(), lr=0.01)
 
