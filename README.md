@@ -15,6 +15,7 @@ conda install pyyaml
 Running instructions
 
 ```bash
+python data_loader.py # to generate the dataset folders
 CLIENT_ID=0 python client.py # on client machine 1
 CLIENT_ID=1 python client.py # on client machine 2
 python server.py --strategy fedprox # on server machine, no need cuda
