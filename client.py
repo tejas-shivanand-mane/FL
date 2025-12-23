@@ -8,6 +8,8 @@ import torchvision.transforms as transforms
 
 import flwr as fl
 from torch.utils.data import DataLoader, Subset
+from models.model import Net
+
 
 # Client identity
 CLIENT_ID = int(os.environ.get("CLIENT_ID", 0))
@@ -15,19 +17,6 @@ NUM_CLIENTS = 2   # total number of clients
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# -----------------------------
-# Model
-# -----------------------------
-class Net(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc1 = nn.Linear(28 * 28, 128)
-        self.fc2 = nn.Linear(128, 10)
-
-    def forward(self, x):
-        x = x.view(-1, 28 * 28)
-        x = torch.relu(self.fc1(x))
-        return self.fc2(x)
 
 # Data partitioning
 
