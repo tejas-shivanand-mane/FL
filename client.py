@@ -9,9 +9,7 @@ import torchvision.transforms as transforms
 import flwr as fl
 from torch.utils.data import DataLoader, Subset
 
-# -----------------------------
 # Client identity
-# -----------------------------
 CLIENT_ID = int(os.environ.get("CLIENT_ID", 0))
 NUM_CLIENTS = 2   # total number of clients
 
@@ -31,9 +29,8 @@ class Net(nn.Module):
         x = torch.relu(self.fc1(x))
         return self.fc2(x)
 
-# -----------------------------
-# Data partitioning (IID)
-# -----------------------------
+# Data partitioning
+
 def load_data(client_id, num_clients):
     transform = transforms.Compose([transforms.ToTensor()])
 
@@ -72,9 +69,7 @@ def load_data(client_id, num_clients):
 
     return trainloader, testloader
 
-# -----------------------------
 # Flower client
-# -----------------------------
 class FlowerClient(fl.client.NumPyClient):
     def __init__(self):
         self.model = Net().to(DEVICE)
@@ -111,11 +106,8 @@ class FlowerClient(fl.client.NumPyClient):
 
         avg_loss = total_loss / total_samples
 
-        return (
-            self.get_parameters(config),
-            total_samples,
-            {"train_loss": avg_loss},
-        )
+        return (self.get_parameters(config), total_samples,{"loss": avg_loss},)
+
 
     def evaluate(self, parameters, config):
         self.set_parameters(parameters)
@@ -145,11 +137,9 @@ class FlowerClient(fl.client.NumPyClient):
             {"accuracy": accuracy},
         )
 
-# -----------------------------
 # Start client
-# -----------------------------
 if __name__ == "__main__":
     fl.client.start_numpy_client(
-        server_address="0.0.0.0:8080",
+        server_address="127.0.0.1:8080",
         client=FlowerClient(),
     )
